@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='目前为复杂问题域创建软件的挑战有这些    未使用通用语言创建的代码
+对于公共语言和问题域知识的缺乏会导致代码库可用但无法揭示业务目的。这会使得代码库难以阅读和维护，因为分析模型和代码模型之间的转译会代价高昂且容易出错。
+什么是分析模型：分析模型用于描述一个软件应用程序的逻辑设计与结构。它可以由示意图或使用UML这样的建模语言表示。它是软件的一种表现形式，让非技术人员可以概念化以便理解软件是如何构造的。
+  组织结构的缺乏
+目前用的多的商业应用程序最流行的软件架构设计模式是大泥球（Big Ball of Mud，BBoM）模式。对他的定义就是一大片构造、凌乱、任意拼贴、毫无头绪的代码丛林。因为它的初衷便是快速制作且通常能获得面面俱到的成功，因此就忽略了围绕问题域模型的应用程序设计，导致后续的功能扩展就会变得很棘手。这样的代码库缺乏与业务行为的协同效用，无法让变更变得可控。
+  ​
+图片
+  泥球模式将扼杀开发
+这种泥球模式会导致功能扩展的步伐放缓。每次发布更新版本时，开发人员必须应对难以理解的混乱的代码库，所以产品的新版本也容易产生缺陷。久而久之，开发速度的增长水平无法满足业务需求。甚至在无法扩展的情况下，可能产生应用程序重构的情况。
+  缺乏对问题域的关注
+先了解下什么是问题域：问题域涉及当前正在构建软件的主题领域。DDD强调的是在致力于为大型复杂业务系统创建软件时专注领域要高于其他一切的需要。问题域的专家要和开发团队一起工作，便于专注在能够制作出有价值软件的领域区域上。比如在给医院编写一个就诊系统时，了解如何成为一名医生不重要，重要的是理解医院的专业术语、不同科室如何接访患者和进行护理、医生要收集哪些信息以及他们要用这些信息做什么。
+而我们没有充分理解正在处理的业务领域时，软件项目就会失败。代码输入并非交付产品的瓶颈，相反，编码是开发中最简单的一部分。在非功能性需求之外创建并维持一个能够满足业务用例的领域的有用的软件模型才是难点所在。
+  最后，DDD是软件开发的一种方式，它使得团队可以高效管理和用于复杂问题域的软件的构造以及维护。
+ How domain-driven design manages complexity？ DDD能同时应对理解问题域以及创建有助于解决其内在问题的可维护解决方案的挑战，是因为它会利用战略和战术模式来达到这一目的。
+DDD的战略模式 在这之前先简单了解下什么是问题空间与解空间
+​	问题空间：问题空间将问题域提炼成更多可管理的子域。问题空间在于揭示什么是重要的以及在何处付出努力。
+​	解空间：涵盖了可以影响应用程序架构发展并让其更易于管理的模式。
+ DDD的战略模式会提炼问题域并塑造应用程序的架构。
+  提炼问题域的重要之处
+开发团队和与领域专家会使用分析模式和知识处理将大的问题域提炼成更具管理性的子域。这个过程会揭示核心子域&amp;mdash;-编写软件的原因。核心领域是处于开发过程的产品背后的驱动力；它是构造产品的根本原因。DDD强调将精力和天赋专注于核心子域上的需要，因为这些核心子域正是保留最大价值以及应用程序成功的关键区域。
+探索核心领域有助于团队理解他们制作软件的原因以及软件对业务达成的成就意味着什么。对业务目标的鉴定也使得开发团队能够确定系统的最重要的部分并为此投入精力。随着业务的发展，软件也得有相应的发展：它需要具备可修改的能力。对应用程序关键区域的代码质量进行投入将有助于应用程序跟上业务的变化节奏。如果软件的关键区域无法和业务领域产生协同效应。那么久而久之该软件设计就有可能会变成一个BBoM模式的大泥球。
+  创建一个模型解决领域问题
+在解空间中，会为每个子域构建一个软件模型来处理领域问题并让软件与业务保持一致。
+  使用公共语言开启建模协作
+DDD围绕着领域进行软件设计，在明确了系统的问题域和业务期望后，就需要进一步梳理出主要的业务流程。这些业务流程体现各个参与者通过业务活动共同协作完成具有业务价值的领域功能。因此需要一门通用语言在产品设计人员、开发人员、测试人员之间达成共识，大家要基于通用语言进行沟通。
+  将模型与歧义和损坏隔离
+模型位于有界上下文内，有界上下文是指用一个清晰可见的边界将上下文描绘出来，这样就能在自己的边界内维持领域模型的一致性和完整性。
+同时有界上下文用于形成一个围绕模型的防护边界，帮助避免软件发展成为BBoM。
+   DDD的战术模式  也称为模型构造块，是一个帮助创建用于复杂有界上下文的有效模型，管理复杂性并确保领域模型中行为的清晰明确，可以使用这些模式来补获和传递领域中的概念、关系、规则。'><title>what is Domain-Driven Design？</title>
+
+<link rel='canonical' href='https://azhsmesos.github.io/post/first/'>
+
+<link rel="stylesheet" href="/scss/style.min.css"><meta property='og:title' content='what is Domain-Driven Design？'>
+<meta property='og:description' content='目前为复杂问题域创建软件的挑战有这些    未使用通用语言创建的代码
+对于公共语言和问题域知识的缺乏会导致代码库可用但无法揭示业务目的。这会使得代码库难以阅读和维护，因为分析模型和代码模型之间的转译会代价高昂且容易出错。
+什么是分析模型：分析模型用于描述一个软件应用程序的逻辑设计与结构。它可以由示意图或使用UML这样的建模语言表示。它是软件的一种表现形式，让非技术人员可以概念化以便理解软件是如何构造的。
+  组织结构的缺乏
+目前用的多的商业应用程序最流行的软件架构设计模式是大泥球（Big Ball of Mud，BBoM）模式。对他的定义就是一大片构造、凌乱、任意拼贴、毫无头绪的代码丛林。因为它的初衷便是快速制作且通常能获得面面俱到的成功，因此就忽略了围绕问题域模型的应用程序设计，导致后续的功能扩展就会变得很棘手。这样的代码库缺乏与业务行为的协同效用，无法让变更变得可控。
+  ​
+图片
+  泥球模式将扼杀开发
+这种泥球模式会导致功能扩展的步伐放缓。每次发布更新版本时，开发人员必须应对难以理解的混乱的代码库，所以产品的新版本也容易产生缺陷。久而久之，开发速度的增长水平无法满足业务需求。甚至在无法扩展的情况下，可能产生应用程序重构的情况。
+  缺乏对问题域的关注
+先了解下什么是问题域：问题域涉及当前正在构建软件的主题领域。DDD强调的是在致力于为大型复杂业务系统创建软件时专注领域要高于其他一切的需要。问题域的专家要和开发团队一起工作，便于专注在能够制作出有价值软件的领域区域上。比如在给医院编写一个就诊系统时，了解如何成为一名医生不重要，重要的是理解医院的专业术语、不同科室如何接访患者和进行护理、医生要收集哪些信息以及他们要用这些信息做什么。
+而我们没有充分理解正在处理的业务领域时，软件项目就会失败。代码输入并非交付产品的瓶颈，相反，编码是开发中最简单的一部分。在非功能性需求之外创建并维持一个能够满足业务用例的领域的有用的软件模型才是难点所在。
+  最后，DDD是软件开发的一种方式，它使得团队可以高效管理和用于复杂问题域的软件的构造以及维护。
+ How domain-driven design manages complexity？ DDD能同时应对理解问题域以及创建有助于解决其内在问题的可维护解决方案的挑战，是因为它会利用战略和战术模式来达到这一目的。
+DDD的战略模式 在这之前先简单了解下什么是问题空间与解空间
+​	问题空间：问题空间将问题域提炼成更多可管理的子域。问题空间在于揭示什么是重要的以及在何处付出努力。
+​	解空间：涵盖了可以影响应用程序架构发展并让其更易于管理的模式。
+ DDD的战略模式会提炼问题域并塑造应用程序的架构。
+  提炼问题域的重要之处
+开发团队和与领域专家会使用分析模式和知识处理将大的问题域提炼成更具管理性的子域。这个过程会揭示核心子域&amp;mdash;-编写软件的原因。核心领域是处于开发过程的产品背后的驱动力；它是构造产品的根本原因。DDD强调将精力和天赋专注于核心子域上的需要，因为这些核心子域正是保留最大价值以及应用程序成功的关键区域。
+探索核心领域有助于团队理解他们制作软件的原因以及软件对业务达成的成就意味着什么。对业务目标的鉴定也使得开发团队能够确定系统的最重要的部分并为此投入精力。随着业务的发展，软件也得有相应的发展：它需要具备可修改的能力。对应用程序关键区域的代码质量进行投入将有助于应用程序跟上业务的变化节奏。如果软件的关键区域无法和业务领域产生协同效应。那么久而久之该软件设计就有可能会变成一个BBoM模式的大泥球。
+  创建一个模型解决领域问题
+在解空间中，会为每个子域构建一个软件模型来处理领域问题并让软件与业务保持一致。
+  使用公共语言开启建模协作
+DDD围绕着领域进行软件设计，在明确了系统的问题域和业务期望后，就需要进一步梳理出主要的业务流程。这些业务流程体现各个参与者通过业务活动共同协作完成具有业务价值的领域功能。因此需要一门通用语言在产品设计人员、开发人员、测试人员之间达成共识，大家要基于通用语言进行沟通。
+  将模型与歧义和损坏隔离
+模型位于有界上下文内，有界上下文是指用一个清晰可见的边界将上下文描绘出来，这样就能在自己的边界内维持领域模型的一致性和完整性。
+同时有界上下文用于形成一个围绕模型的防护边界，帮助避免软件发展成为BBoM。
+   DDD的战术模式  也称为模型构造块，是一个帮助创建用于复杂有界上下文的有效模型，管理复杂性并确保领域模型中行为的清晰明确，可以使用这些模式来补获和传递领域中的概念、关系、规则。'>
+<meta property='og:url' content='https://azhsmesos.github.io/post/first/'>
+<meta property='og:site_name' content='My New Hugo Site'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2021-10-27T18:38:55&#43;08:00'/><meta property='article:modified_time' content='2021-10-27T18:38:55&#43;08:00'/>
+<meta name="twitter:title" content="what is Domain-Driven Design？">
+<meta name="twitter:description" content="目前为复杂问题域创建软件的挑战有这些    未使用通用语言创建的代码
+对于公共语言和问题域知识的缺乏会导致代码库可用但无法揭示业务目的。这会使得代码库难以阅读和维护，因为分析模型和代码模型之间的转译会代价高昂且容易出错。
+什么是分析模型：分析模型用于描述一个软件应用程序的逻辑设计与结构。它可以由示意图或使用UML这样的建模语言表示。它是软件的一种表现形式，让非技术人员可以概念化以便理解软件是如何构造的。
+  组织结构的缺乏
+目前用的多的商业应用程序最流行的软件架构设计模式是大泥球（Big Ball of Mud，BBoM）模式。对他的定义就是一大片构造、凌乱、任意拼贴、毫无头绪的代码丛林。因为它的初衷便是快速制作且通常能获得面面俱到的成功，因此就忽略了围绕问题域模型的应用程序设计，导致后续的功能扩展就会变得很棘手。这样的代码库缺乏与业务行为的协同效用，无法让变更变得可控。
+  ​
+图片
+  泥球模式将扼杀开发
+这种泥球模式会导致功能扩展的步伐放缓。每次发布更新版本时，开发人员必须应对难以理解的混乱的代码库，所以产品的新版本也容易产生缺陷。久而久之，开发速度的增长水平无法满足业务需求。甚至在无法扩展的情况下，可能产生应用程序重构的情况。
+  缺乏对问题域的关注
+先了解下什么是问题域：问题域涉及当前正在构建软件的主题领域。DDD强调的是在致力于为大型复杂业务系统创建软件时专注领域要高于其他一切的需要。问题域的专家要和开发团队一起工作，便于专注在能够制作出有价值软件的领域区域上。比如在给医院编写一个就诊系统时，了解如何成为一名医生不重要，重要的是理解医院的专业术语、不同科室如何接访患者和进行护理、医生要收集哪些信息以及他们要用这些信息做什么。
+而我们没有充分理解正在处理的业务领域时，软件项目就会失败。代码输入并非交付产品的瓶颈，相反，编码是开发中最简单的一部分。在非功能性需求之外创建并维持一个能够满足业务用例的领域的有用的软件模型才是难点所在。
+  最后，DDD是软件开发的一种方式，它使得团队可以高效管理和用于复杂问题域的软件的构造以及维护。
+ How domain-driven design manages complexity？ DDD能同时应对理解问题域以及创建有助于解决其内在问题的可维护解决方案的挑战，是因为它会利用战略和战术模式来达到这一目的。
+DDD的战略模式 在这之前先简单了解下什么是问题空间与解空间
+​	问题空间：问题空间将问题域提炼成更多可管理的子域。问题空间在于揭示什么是重要的以及在何处付出努力。
+​	解空间：涵盖了可以影响应用程序架构发展并让其更易于管理的模式。
+ DDD的战略模式会提炼问题域并塑造应用程序的架构。
+  提炼问题域的重要之处
+开发团队和与领域专家会使用分析模式和知识处理将大的问题域提炼成更具管理性的子域。这个过程会揭示核心子域&amp;mdash;-编写软件的原因。核心领域是处于开发过程的产品背后的驱动力；它是构造产品的根本原因。DDD强调将精力和天赋专注于核心子域上的需要，因为这些核心子域正是保留最大价值以及应用程序成功的关键区域。
+探索核心领域有助于团队理解他们制作软件的原因以及软件对业务达成的成就意味着什么。对业务目标的鉴定也使得开发团队能够确定系统的最重要的部分并为此投入精力。随着业务的发展，软件也得有相应的发展：它需要具备可修改的能力。对应用程序关键区域的代码质量进行投入将有助于应用程序跟上业务的变化节奏。如果软件的关键区域无法和业务领域产生协同效应。那么久而久之该软件设计就有可能会变成一个BBoM模式的大泥球。
+  创建一个模型解决领域问题
+在解空间中，会为每个子域构建一个软件模型来处理领域问题并让软件与业务保持一致。
+  使用公共语言开启建模协作
+DDD围绕着领域进行软件设计，在明确了系统的问题域和业务期望后，就需要进一步梳理出主要的业务流程。这些业务流程体现各个参与者通过业务活动共同协作完成具有业务价值的领域功能。因此需要一门通用语言在产品设计人员、开发人员、测试人员之间达成共识，大家要基于通用语言进行沟通。
+  将模型与歧义和损坏隔离
+模型位于有界上下文内，有界上下文是指用一个清晰可见的边界将上下文描绘出来，这样就能在自己的边界内维持领域模型的一致性和完整性。
+同时有界上下文用于形成一个围绕模型的防护边界，帮助避免软件发展成为BBoM。
+   DDD的战术模式  也称为模型构造块，是一个帮助创建用于复杂有界上下文的有效模型，管理复杂性并确保领域模型中行为的清晰明确，可以使用这些模式来补获和传递领域中的概念、关系、规则。">
+    </head>
+    <body class="
+    article-page has-toc
+">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex 
+    
+        extended
+    
+">
+    
+        <div id="article-toolbar">
+            <a href="/" class="back-home">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="15 6 9 12 15 18" />
+</svg>
+
+
+
+                <span>Back</span>
+            </a>
+        </div>
+    
+<main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <h2 class="article-title">
+        <a href="/post/first/">what is Domain-Driven Design？</a>
+    </h2>
+
+    
+
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Oct 27, 2021</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    1 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+</div>
+</header>
+
+    <section class="article-content">
+    <h4 id="目前为复杂问题域创建软件的挑战有这些">目前为复杂问题域创建软件的挑战有这些</h4>
+<blockquote>
+<ul>
+<li>
+<p>未使用通用语言创建的代码</p>
+<p>对于公共语言和问题域知识的缺乏会导致代码库可用但无法揭示业务目的。这会使得代码库难以阅读和维护，因为分析模型和代码模型之间的转译会代价高昂且容易出错。</p>
+<p>什么是分析模型：分析模型用于描述一个软件应用程序的逻辑设计与结构。它可以由示意图或使用UML这样的建模语言表示。它是软件的一种表现形式，让非技术人员可以概念化以便理解软件是如何构造的。</p>
+</li>
+<li>
+<p>组织结构的缺乏</p>
+<p>目前用的多的商业应用程序最流行的软件架构设计模式是大泥球（Big Ball of Mud，BBoM）模式。对他的定义就是一大片构造、凌乱、任意拼贴、毫无头绪的代码丛林。因为它的初衷便是快速制作且通常能获得面面俱到的成功，因此就忽略了围绕问题域模型的应用程序设计，导致后续的功能扩展就会变得很棘手。这样的代码库缺乏与业务行为的协同效用，无法让变更变得可控。</p>
+</li>
+</ul>
+<p>​</p>
+<p><figure 
+	>
+	<a href="https://mmbiz.qpic.cn/mmbiz_png/5ces7GtYe0Dd5jiaUhPAH9ZbqAAQB2xDqIaPI4QnREyln1rqdRjq2icMsGLeDjWy6Pk1xVIluGib1Qakv5FyCn8og/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1&amp;wx_co=1" >
+		<img src="https://mmbiz.qpic.cn/mmbiz_png/5ces7GtYe0Dd5jiaUhPAH9ZbqAAQB2xDqIaPI4QnREyln1rqdRjq2icMsGLeDjWy6Pk1xVIluGib1Qakv5FyCn8og/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1&amp;wx_co=1"
+			
+			
+			
+			loading="lazy"
+			alt="图片">
+	</a>
+	
+	<figcaption>图片</figcaption>
+	
+</figure></p>
+<ul>
+<li>
+<p>泥球模式将扼杀开发</p>
+<p>这种泥球模式会导致功能扩展的步伐放缓。每次发布更新版本时，开发人员必须应对难以理解的混乱的代码库，所以产品的新版本也容易产生缺陷。久而久之，开发速度的增长水平无法满足业务需求。甚至在无法扩展的情况下，可能产生应用程序重构的情况。</p>
+</li>
+<li>
+<p>缺乏对问题域的关注</p>
+<p>先了解下什么是问题域：问题域涉及当前正在构建软件的主题领域。DDD强调的是在致力于为大型复杂业务系统创建软件时专注领域要高于其他一切的需要。问题域的专家要和开发团队一起工作，便于专注在能够制作出有价值软件的领域区域上。比如在给医院编写一个就诊系统时，了解如何成为一名医生不重要，重要的是理解医院的专业术语、不同科室如何接访患者和进行护理、医生要收集哪些信息以及他们要用这些信息做什么。</p>
+<p>而我们没有充分理解正在处理的业务领域时，软件项目就会失败。代码输入并非交付产品的瓶颈，相反，编码是开发中最简单的一部分。在非功能性需求之外创建并维持一个能够满足业务用例的领域的有用的软件模型才是难点所在。</p>
+</li>
+</ul>
+<p>最后，DDD是软件开发的一种方式，它使得团队可以高效管理和用于复杂问题域的软件的构造以及维护。</p>
+</blockquote>
+<h4 id="how-domain-driven-design-manages-complexity">How domain-driven design manages complexity？</h4>
+<p>DDD能同时应对理解问题域以及创建有助于解决其内在问题的可维护解决方案的挑战，是因为它会利用战略和战术模式来达到这一目的。</p>
+<h6 id="ddd的战略模式">DDD的战略模式</h6>
+<p>在这之前先简单了解下什么是问题空间与解空间</p>
+<p>​	问题空间：问题空间将问题域提炼成更多可管理的子域。问题空间在于揭示什么是重要的以及在何处付出努力。</p>
+<p>​	解空间：涵盖了可以影响应用程序架构发展并让其更易于管理的模式。</p>
+<blockquote>
+<p>DDD的战略模式会提炼问题域并塑造应用程序的架构。</p>
+<ul>
+<li>
+<p>提炼问题域的重要之处</p>
+<p>开发团队和与领域专家会使用分析模式和知识处理将大的问题域提炼成更具管理性的子域。这个过程会揭示核心子域&mdash;-编写软件的原因。核心领域是处于开发过程的产品背后的驱动力；它是构造产品的根本原因。DDD强调将精力和天赋专注于核心子域上的需要，因为这些核心子域正是保留最大价值以及应用程序成功的关键区域。</p>
+<p>探索核心领域有助于团队理解他们制作软件的原因以及软件对业务达成的成就意味着什么。对业务目标的鉴定也使得开发团队能够确定系统的最重要的部分并为此投入精力。随着业务的发展，软件也得有相应的发展：它需要具备可修改的能力。对应用程序关键区域的代码质量进行投入将有助于应用程序跟上业务的变化节奏。如果软件的关键区域无法和业务领域产生协同效应。那么久而久之该软件设计就有可能会变成一个BBoM模式的大泥球。</p>
+</li>
+<li>
+<p>创建一个模型解决领域问题</p>
+<p>在解空间中，会为每个子域构建一个软件模型来处理领域问题并让软件与业务保持一致。</p>
+</li>
+<li>
+<p>使用公共语言开启建模协作</p>
+<p>DDD围绕着领域进行软件设计，在明确了系统的问题域和业务期望后，就需要进一步梳理出主要的业务流程。这些业务流程体现各个参与者通过业务活动共同协作完成具有业务价值的领域功能。因此需要一门通用语言在产品设计人员、开发人员、测试人员之间达成共识，大家要基于通用语言进行沟通。</p>
+</li>
+<li>
+<p>将模型与歧义和损坏隔离</p>
+<p>模型位于有界上下文内，有界上下文是指用一个清晰可见的边界将上下文描绘出来，这样就能在自己的边界内维持领域模型的一致性和完整性。</p>
+<p>同时有界上下文用于形成一个围绕模型的防护边界，帮助避免软件发展成为BBoM。</p>
+</li>
+</ul>
+</blockquote>
+<h6 id="ddd的战术模式">DDD的战术模式</h6>
+<blockquote>
+<p>也称为模型构造块，是一个帮助创建用于复杂有界上下文的有效模型，管理复杂性并确保领域模型中行为的清晰明确，可以使用这些模式来补获和传递领域中的概念、关系、规则。</p>
+</blockquote>
+<h4 id="practices-and-principles-of-domain-driven-design">Practices and principles of domain-driven design</h4>
+<blockquote>
+<ul>
+<li>
+<p>专注核心领域</p>
+<p>DDD强调的是在核心子领域付出最多努力的需要。核心子域是产品成功还是失败的差异化因素所在，团队要理解核心领域是什么。</p>
+</li>
+<li>
+<p>通过协作进行学习</p>
+<p>DDD强调开发团队和业务专家之间协作产生出解决问题的有用模型。</p>
+</li>
+<li>
+<p>通过探索和实验创造模型</p>
+<p>对于一个良好设计至少有三个较差的设计，这样避免团队在首个有用模型处就停止前进。</p>
+</li>
+<li>
+<p>通信</p>
+<p>能够有效描述构建用于呈现问题域的模型的能力是DDD的基础，而这正是UL（通用语言）的创造的原因。如果没有没有UL，业务和开发团队之间为了解决问题的协作将变得没有效率。而UL使得业务和开发团队对问题域的更多理解和更有效的通信成为可能。</p>
+</li>
+<li>
+<p>理解模型的适用性</p>
+<p>我们所构建的每个模型都可以在其子域的上下文中被理解并使用UL来进行描述。不过，在许多大模型中，UL 可能会产生歧义，一个组织中的不同部分对于一个通用术语或概念可能会有不同的理解。而DDD通过确保每个模型拥有其专用的只在特定上下文中有效的UL来应对这一个问题。每个上下文都会定义一个语言边界，确保模型能在特定的上下文中被理解，用来避免语言中的歧义。因此具有重叠术语的模型会被分成两个模型，每个都在其专有的上下文中清晰定义。而战略模式能够强制使用这些语言边界让模型可以独立发展，这样会使得组织好的代码能够支持变更和重写。</p>
+</li>
+<li>
+<p>让模型持续发展</p>
+<p>在开发过程中，如果源代码和问题域之间没有协同作用的话，持续发展可能会导致产生难以修改的代码库，从而产生BBoM。DDD通过将重心放在团队持续考虑模型对当前问题的有用程度来帮助解决此问题。</p>
+</li>
+</ul>
+</blockquote>
+<ul>
+<li>Domain-driven design 是一种开发思想体系，它旨在管理为复杂问题域编写的软件的创建和维护工作。</li>
+<li>Domain-Driven design是模式、原则和实践的集合，它可以被应用到软件设计以管理复杂性。</li>
+<li>Domain-Driven design具有两种模式类型，战略模式影响的是解决方案，而战术模式实现富领域模型。战略模式对于任何应用程序都有用，但战术模式只有当模型在领域逻辑中足够丰富时才有用。</li>
+<li>将大的问题域提炼成子域可以揭示核心领域&mdash;价值最大的区域。设计一款软件时并非所有部分都被精心设计，团队必须在产品的核心子域中投入更多的时间。</li>
+<li>为每一个子域创建一个抽象模型以便管理领域问题。</li>
+<li>Domian-Driven design并非时一种模式语言，它专注于交付的一种协作思想体系，其中通信起着核心作用。</li>
+<li>Domain-Driven design侧重于将关注点放在这些内容上：核心领域、协作、与领域专家进行探讨、实验研究生成更有用的模型和对于在复杂问题域中起作用的各种上下文的理解</li>
+</ul>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+</article>
+
+    <aside class="related-contents--wrapper">
+    
+    
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2021 My New Hugo Site
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.4.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer="true"
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer="true"
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.css"integrity="sha256-c0uckgykQ9v5k&#43;IqViZOZKc47Jn7KQil4/MP3ySA3F8="crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css"integrity="sha256-SBLU4vv6CA6lHsZ1XyTdhyjJxCjPif/TRkjnsyGAGnE="crossorigin="anonymous"
+            >
+
+            </main>
+    
+        <aside class="sidebar right-sidebar sticky">
+            <section class="widget archives">
+                <div class="widget-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+                </div>
+                <h2 class="widget-title section-title">Table of contents</h2>
+                
+                <div class="widget--toc">
+                    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+                </div>
+            </section>
+        </aside>
+    
+
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.5/dist/vibrant.min.js"integrity="sha256-5NovOZc4iwiAWTYIFiIM7DxKUXKWvpVEuMEPLzcm5/g="crossorigin="anonymous"
+                defer="false"
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
