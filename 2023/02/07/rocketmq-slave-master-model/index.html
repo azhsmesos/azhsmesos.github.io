@@ -20,18 +20,30 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":240,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="RocketMQ">
+  <meta name="description" content="我参与的只是一个小模块，事物消息的逃逸机制，话不多说，先讲一下总的背景吧～ RocketMQ BrokerContainer  首先先介绍一下 RIP-31（RocketMQ Improvement Proposal 31） 背景当前RocketMQ一个进程只有一个broker，通常会以主备或者DLdger（Raft）的形式部署，但是一个进程中只有一个broker，而slave一般只承担冷备或热备">
 <meta property="og:type" content="article">
 <meta property="og:title" content="RocketMQ 事物消息的逃逸机制">
 <meta property="og:url" content="http://example.com/2023/02/07/rocketmq-slave-master-model/index.html">
 <meta property="og:site_name" content="aviel的博客">
-<meta property="og:description" content="RocketMQ">
+<meta property="og:description" content="我参与的只是一个小模块，事物消息的逃逸机制，话不多说，先讲一下总的背景吧～ RocketMQ BrokerContainer  首先先介绍一下 RIP-31（RocketMQ Improvement Proposal 31） 背景当前RocketMQ一个进程只有一个broker，通常会以主备或者DLdger（Raft）的形式部署，但是一个进程中只有一个broker，而slave一般只承担冷备或热备">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://static.yximgs.com/udata/pkg/EE-KSTACK/50cc24b8f7f41b9fbf7e947fa9c427a5.png">
+<meta property="og:image" content="https://static.yximgs.com/udata/pkg/EE-KSTACK/05f7ed9d2bb2e3315e411bb2e870a67a.png">
+<meta property="og:image" content="https://static.yximgs.com/udata/pkg/EE-KSTACK/943bde866d72977f64c95afb2756f375.png">
+<meta property="og:image" content="https://static.yximgs.com/udata/pkg/EE-KSTACK/3cb04efd5f6061fa5128b2b4879177f1.png">
+<meta property="og:image" content="https://static.yximgs.com/udata/pkg/EE-KSTACK/cdc80f617ff88cf5aba961b87f7ef5e4.png">
+<meta property="og:image" content="https://static.yximgs.com/udata/pkg/EE-KSTACK/fafd96a7952b3873b0a3d0b6649b33d6.png">
+<meta property="og:image" content="https://static.yximgs.com/udata/pkg/EE-KSTACK/f03f977ac8961300f8f9883f1ea3a416.png">
+<meta property="og:image" content="https://static.yximgs.com/udata/pkg/EE-KSTACK/bb1e785a7813ff51d7d98b2bc5153535.png">
+<meta property="og:image" content="https://static.yximgs.com/udata/pkg/EE-KSTACK/16614caf7235bcaa40bbe3eac65b6809.png">
+<meta property="og:image" content="https://static.yximgs.com/udata/pkg/EE-KSTACK/c9162bf538012c28ea8e84a9bb5bd994.png">
+<meta property="og:image" content="https://static.yximgs.com/udata/pkg/EE-KSTACK/1b99dfbf51c71096355addcad014f397.png">
 <meta property="article:published_time" content="2023-02-07T02:45:25.000Z">
-<meta property="article:modified_time" content="2023-02-07T02:48:30.918Z">
+<meta property="article:modified_time" content="2023-02-07T03:09:35.746Z">
 <meta property="article:author" content="aviel">
 <meta property="article:tag" content="mq">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://static.yximgs.com/udata/pkg/EE-KSTACK/50cc24b8f7f41b9fbf7e947fa9c427a5.png">
 
 <link rel="canonical" href="http://example.com/2023/02/07/rocketmq-slave-master-model/">
 
@@ -193,7 +205,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2023-02-07 10:45:25 / 修改时间：10:48:30" itemprop="dateCreated datePublished" datetime="2023-02-07T10:45:25+08:00">2023-02-07</time>
+              <time title="创建时间：2023-02-07 10:45:25 / 修改时间：11:09:35" itemprop="dateCreated datePublished" datetime="2023-02-07T10:45:25+08:00">2023-02-07</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -223,7 +235,70 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>RocketMQ</p>
+        <p>我参与的只是一个小模块，事物消息的逃逸机制，话不多说，先讲一下总的背景吧～</p>
+<h3 id="RocketMQ-BrokerContainer"><a href="#RocketMQ-BrokerContainer" class="headerlink" title="RocketMQ BrokerContainer"></a>RocketMQ BrokerContainer</h3><p>  首先先介绍一下 RIP-31（RocketMQ Improvement Proposal 31）</p>
+<h4 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h4><p>当前RocketMQ一个进程只有一个broker，通常会以主备或者DLdger（Raft）的形式部署，但是一个进程中只有一个broker，而slave一般只承担冷备或热备的作用，节点之间角色的不对等导致slave节点资源没有充分被利用。</p>
+<ul>
+<li>Master-Slave冷备部署</li>
+</ul>
+<p><img src="https://static.yximgs.com/udata/pkg/EE-KSTACK/50cc24b8f7f41b9fbf7e947fa9c427a5.png" alt="file"></p>
+<ul>
+<li>DLedger模式热部署</li>
+</ul>
+<p><img src="https://static.yximgs.com/udata/pkg/EE-KSTACK/05f7ed9d2bb2e3315e411bb2e870a67a.png" alt="file"><br> 因此 在RIP-31中希望提供一种新的模式BrokerContainer，希望在一个BrokerContainer进程中可以加入多个broker（Master Broker、Slave Broker、DLedger Broker），来提高单个节点的资源利用率，并且可以通过各种形式的交叉部署来实现节点之间的对等部署。</p>
+<h5 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h5><ol>
+<li>一个BrokerConatiner进程中可以加入多个broker，通过进程内混部来提高单个节点的资源利用率<br>通过各种形式的交叉部署来实现节点之间的对等部署，增强单节点的高可用能力</li>
+<li>利用BrokerConatiner可以实现单进程内多commitlog写入，也可以实现单机的多磁盘写入</li>
+<li>BrokerContainer中的Commitlog天然隔离的，不同的Commitlog（broker）可以采取不同作用，比如可以用来比如创建单独的broker做不同TTL的commitlog。</li>
+</ol>
+<h5 id="BrokerContainer-单进程结构"><a href="#BrokerContainer-单进程结构" class="headerlink" title="BrokerContainer 单进程结构"></a>BrokerContainer 单进程结构</h5><p><img src="https://static.yximgs.com/udata/pkg/EE-KSTACK/943bde866d72977f64c95afb2756f375.png" alt="file"><br> 相比于原来一个broker一个进程，RIP-31将增加brokerContainer概念，一个brokerContainer可以存放多个broker，每个broker拥有不同的端口，但它们共享同一个传输层（remoting层），而每一个broker在功能上是完全独立的。BrokerContainer也拥有自己端口，在运行时可以通过admin命令来增加或减少broker。</p>
+<h5 id="对等部署形态"><a href="#对等部署形态" class="headerlink" title="对等部署形态"></a>对等部署形态</h5><p>在BrokerContainer模式下，RIP-31可以通过各种形式的交叉部署完成节点的对等部署</p>
+<ul>
+<li><h6 id="二副本对等部署形态"><a href="#二副本对等部署形态" class="headerlink" title="二副本对等部署形态"></a>二副本对等部署形态</h6></li>
+</ul>
+<p><img src="https://static.yximgs.com/udata/pkg/EE-KSTACK/3cb04efd5f6061fa5128b2b4879177f1.png" alt="file"><br> 二副本对等部署情况下，每个节点都会有一主一备，资源利用率均等。另外假设图中Node1宕机，由于Node2的broker_2可读可写，broker_1可以备读，因此普通消息的收发不会收到影响，单节点的高可用能力得到了增强。</p>
+<ul>
+<li><h6 id="三副本对等部署形态"><a href="#三副本对等部署形态" class="headerlink" title="三副本对等部署形态"></a>三副本对等部署形态</h6></li>
+</ul>
+<p><img src="https://static.yximgs.com/udata/pkg/EE-KSTACK/cdc80f617ff88cf5aba961b87f7ef5e4.png" alt="file"><br> 三副本对等部署情况下，每个节点都会有一主两备，资源利用率均等。此外，和二副本一样，任意一个节点的宕机也不会影响到普通消息的收发。</p>
+<p> 注：以Master-Slave1-Slave2或者DLedger模式下利用preferred leader选主进行三副本部署均可</p>
+<p> 从单进程看，rocketmq资源利用率是得到有效提高了的。</p>
+<h3 id="RocketMQ-Slave-Acting-Master-Mode"><a href="#RocketMQ-Slave-Acting-Master-Mode" class="headerlink" title="RocketMQ Slave Acting Master Mode"></a>RocketMQ Slave Acting Master Mode</h3><p>来到本次PR的重头戏，RIP-32（RocketMQ Improvement Proposal 32）<br>目前RocketMQ存在的问题（应该基本所有的高可用集群都会存在这个问题）<br><img src="https://static.yximgs.com/udata/pkg/EE-KSTACK/fafd96a7952b3873b0a3d0b6649b33d6.png" alt="file"><br> 这是RocketMQ Master-Slave的冷备部署，在该部署方式下，即使一个Master掉线，发送端仍然可以向其他Master发送消息，对于消费端而言，若开启备读，Consumer会自动重连到对应的Slave机器，不会出现消费停滞的情况。但也存在以下问题：</p>
+<ol>
+<li>一些仅限于在Master上进行的操作将无法进行，包括且不限于：</li>
+</ol>
+<ul>
+<li>searchOffset</li>
+<li>maxOffset</li>
+<li>minOffset</li>
+<li>earliestMsgStoreTime</li>
+<li>endTransaction</li>
+<li>所有锁MQ相关操作，包括lock, unlock, lockBatch, unlockAll<br>  具体影响为：</li>
+<li>客户端无法获取位于该副本组的mq的锁，故当本地锁过期后，将无法消费该组的顺序消息</li>
+<li>客户端无法主动结束处于半状态的事务消息，只能等待broker回查事务状态</li>
+<li>admin tools或控制中依赖查询offset及earliestMsgStoreTime等操作在该组上无法生效</li>
+</ul>
+<p> 2.故障Broker组上的二级消息消费将会中断，该类消息特点依赖Master Broker上的线程扫描CommitLog上的特殊Topic，并将满足要求的消息投放回CommitLog，如果Master Broker下线，会出现二级消息的消费延迟或丢失。具体会影响到当前版本的延迟消息消费、事务消息消费、Pop消费。</p>
+<p> 3.没有元数据的反向同步。Master重新被人工拉起后，容易造成元数据的回退，如Master上线后将落后的消费位点同步给备，该组broker的消费位点回退，造成大量消费重复。</p>
+<h6 id="RocketMQ-DLedger-架构"><a href="#RocketMQ-DLedger-架构" class="headerlink" title="RocketMQ DLedger 架构"></a>RocketMQ DLedger 架构</h6><p><img src="https://static.yximgs.com/udata/pkg/EE-KSTACK/f03f977ac8961300f8f9883f1ea3a416.png" alt="file"><br> Raft实现的DLedger架构可以规避以上问题，但是需要强制至少三副本才行。</p>
+<p> 所以RIP-32提出一个新的方案，Slave代理Master模式，作为Master-Slave部署模式的升级。在原先Master-Slave部署模式下，通过备代理主、轻量级心跳、副本组信息获取、broker预上线机制、二级消息逃逸等方式，当同组Master发生故障时，Slave将承担更加重要的作用。</p>
+<ul>
+<li>目标优化<br> 1.当Master下线后，该组中brokerId最小的Slave会承担备读 以及 一些 客户端和管控会访问 但却只能在Master节点上完成的任务。包括且不限于searchOffset、maxOffset、minOffset、earliestMsgStoreTime、endTransaction以及所有锁MQ相关操作lock, unlock, lockBatch, unlockAll。<br> 2.当Master下线后，故障Broker组上的二级消息消费将不会中断，由该组中该组中brokerId最小的Slave承担起该任务，定时消息、Pop消息、事务消息等仍然可以正常运行。<br> 3.当Master下线后，在Slave代理Master一段时间主后，然后当Master再次上线后，通过预上线机制，Master会自动完成元数据的反向同步后再上线，不会出现元数据回退，造成消息大量重复消费或二级消息大量重放。</li>
+</ul>
+<h6 id="Slave-Master-代理图"><a href="#Slave-Master-代理图" class="headerlink" title="Slave Master 代理图"></a>Slave Master 代理图</h6><p><img src="https://static.yximgs.com/udata/pkg/EE-KSTACK/bb1e785a7813ff51d7d98b2bc5153535.png" alt="file"><br>Master下线后Slave能正常消费，且在不修改客户端代码情况下完成只能在Master完成的操作源自于Namesrv对“代理”Master的支持。此处“代理”Master指的是，当副本组处于无主状态时，Namesrv将把brokerId最小的存活Slave视为“代理”Master，具体表现为在构建TopicRouteData时，将该Slave的brokerId替换为0，并将brokerPermission修改为4（Read-Only），从而使得该Slave在客户端视图中充当只读模式的Master的角色。</p>
+<p>此外，当Master下线后，brokerId最小的Slave会承担起二级消息的扫描和重新投递功能，这也是“代理”的一部分。</p>
+<h4 id="轻量级心跳和获取副本组信息"><a href="#轻量级心跳和获取副本组信息" class="headerlink" title="轻量级心跳和获取副本组信息"></a>轻量级心跳和获取副本组信息</h4><p>brokerId最小的存活Slave在Master故障后开启自动代理Master模式，因此需要一种机制，这个机制需要保证以下条件：<br>1.Nameserver能及时发现broker上下线并完成路由替换以及下线broker的路由剔除。<br>2.Broker能及时感知到同组Broker的上下线情况。</p>
+<p>针对1，由RocetMQ的nameserver组件的判活机制保证，定时扫描不活跃的broker将其下线，而原本broker与nameserver的“心跳”则依赖于registerBroker操作，而这个操作涉及到topic信息上报，过于“重”，而且注册间隔过于长，因此需要一个轻量级的心跳机制，RIP-32在nameserver和broker间新增BrokerHeartbeat请求，broker会定时向nameserver发送心跳，若nameserver定时任务扫描发现超过心跳超时时间仍未收到该broker的心跳，将unregister该broker。registerBroker时会完成心跳超时时间的设置，并且注册时如果发现broker组内最小brokerId发生变化，将反向通知该组所有broker，并在路由获取时将最小brokerId的Slave路由替换使其充当只读模式的Master的角色</p>
+<p>针对2，两种处理：<br>1是上文中介绍的当nameserver发现该broker组内最小brokerId发生变化，反向通知该组所有broker。<br>2是broker自身会有定时任务，向nameserver同步本broker组存活broker的信息</p>
+<h4 id="二级消息逃逸（我参与的就是事物消息的逃逸机制）"><a href="#二级消息逃逸（我参与的就是事物消息的逃逸机制）" class="headerlink" title="二级消息逃逸（我参与的就是事物消息的逃逸机制）"></a>二级消息逃逸（我参与的就是事物消息的逃逸机制）</h4><p> 正如上面所说，代理模式开启后，brokerId最小的Slave会承担起二级消息的扫描和重新投递功能。<br> 二级消息一般分为两个阶段，发送或者消费时会发送到一个特殊topic中，后台会有线程会扫描，最终的满足要求的消息会被重新投递到Commitlog中。我们可以让brokerId最小的Slave进行扫描，但如果扫描之后的消息重新投递到本Commitlog，那将会破坏Slave不可写的语义，造成Commitlog分叉。因此RIP-32提出一种逃逸机制，将重放的二级消息远程或本地投放到其他Master的Commitlog中。<br> 事物消息大概是： half主题 —–&gt; op主题 —–&gt; 消费主题 —– consumer消费</p>
+<h6 id="本地逃逸"><a href="#本地逃逸" class="headerlink" title="本地逃逸"></a>本地逃逸</h6><p><img src="https://static.yximgs.com/udata/pkg/EE-KSTACK/16614caf7235bcaa40bbe3eac65b6809.png" alt="file"><br>  就是在RIP-31的 BrokerContainer模式下向本地Master逃逸，如果开启了BrokerContainer会优先向同进程的Master逃逸，避免远程RPC。</p>
+<h6 id="远程逃逸"><a href="#远程逃逸" class="headerlink" title="远程逃逸"></a>远程逃逸</h6><p><img src="https://static.yximgs.com/udata/pkg/EE-KSTACK/c9162bf538012c28ea8e84a9bb5bd994.png" alt="file"><br> 如上图所示，假设Region A发生故障，Region B中的节点2将会承担二级消息的扫描任务，同时将最终的满足要求的消息通过EscapeBridge远程发送到当前Broker集群中仍然存活的Master上。<br>  比如以下消息：<br>  延迟消息<br>  POP消息<br>  事物消息</p>
+<h6 id="预上线机制"><a href="#预上线机制" class="headerlink" title="预上线机制"></a>预上线机制</h6><p><img src="https://static.yximgs.com/udata/pkg/EE-KSTACK/1b99dfbf51c71096355addcad014f397.png" alt="file"><br>Master下线后，Slave Master代理消费、备读，如果Master重新上线，当前消费位点肯定比Master宕机时超前，如果直接上线就会导致消费位点offset回滚覆盖，可能造成重复消费。<br>为consumerOffset和delayOffset等元数据增加版本号（DataVersion）的概念，并且为了防止版本号更新太频繁，增加更新步长的概念，比如对于消费位点来说，默认每更新位点超过500次，版本号增加到下一个版本。<br>Master Broker启动前会进行预上线，在预上线之前，不对nameserver发送注册，因此不会对外提供服务，其预上线机制如下：<br>1.Master Broker向NameServer获取Slave Broker地址（GetBrokerMemberGroup请求），但不注册<br>2.Master Broker向Slave Broker发送自己的状态信息和地址<br>3.Slave Broker得到Master Broker地址后和状态信息后，建立HA连接，并完成握手，进入Transfer状态<br>4.Master Broker再完成握手后，反向获取备的元数据，包括消费位点、定时消息进度等，根据版本号决定是否更新。<br>5.Master Broker对broker组内所有Slave Broker都完成1-4步操作后，正式上线，向NameServer注册，正式对外提供服务。</p>
+<p><strong>可能会造成的问题：</strong></p>
+<p>当Slave代理Master时，外部看到的是“只读”的Master，因此顺序消息仍然可以对队列上锁，消费不会中断。但当真的Master重新上线后，在一定的时间差内可能会造成多个consumer锁定同一个队列，比如一个consumer仍然锁着代理的备某一个队列，一个consumer锁刚上线的主的同一队列，造成顺序消息的乱序和重复。</p>
+<p>因此RIP-32在lock操作时要求，需锁broker副本组的大多数成员（quorum NWR算法原则）均成功才算锁成功。但两副本下达不到qurum的原则，所以RIP-32提供了lockInStrictMode参数，表示消费端消费顺序消息锁队列时是否使用严格模式。严格模式即对单个队列而言，需锁副本组的大多数成员（quorum原则）均成功才算锁成功，非严格模式即锁任意一副本成功就算锁成功，该参数默认为false。当对消息顺序性高于可用性时，需将该参数设置为false。</p>
+<p>以上大概就是RocketMQ的两个模式，均是为了提高RocketMQ资源利用率，虽然我仅仅只是参与了其中事物消息的逃逸机制的部分开发，但是这段经历让我从对RocketMQ完全不理解变得稍微懂那么一点点了～ 其实开源很有趣，因为这是一种驱动式成长，同时可以和来自全世界的人做你感兴趣的事儿，还有什么比这个更有趣呢？</p>
+<p>这是我在支付实习的第一篇文章估计也是最后一篇，学校开学了不得不回去了…..</p>
 
     </div>
 
@@ -323,6 +398,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#RocketMQ-BrokerContainer"><span class="nav-number">1.</span> <span class="nav-text">RocketMQ BrokerContainer</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.1.</span> <span class="nav-text">背景</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87"><span class="nav-number">1.1.1.</span> <span class="nav-text">目标</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#BrokerContainer-%E5%8D%95%E8%BF%9B%E7%A8%8B%E7%BB%93%E6%9E%84"><span class="nav-number">1.1.2.</span> <span class="nav-text">BrokerContainer 单进程结构</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%AF%B9%E7%AD%89%E9%83%A8%E7%BD%B2%E5%BD%A2%E6%80%81"><span class="nav-number">1.1.3.</span> <span class="nav-text">对等部署形态</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#%E4%BA%8C%E5%89%AF%E6%9C%AC%E5%AF%B9%E7%AD%89%E9%83%A8%E7%BD%B2%E5%BD%A2%E6%80%81"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">二副本对等部署形态</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E4%B8%89%E5%89%AF%E6%9C%AC%E5%AF%B9%E7%AD%89%E9%83%A8%E7%BD%B2%E5%BD%A2%E6%80%81"><span class="nav-number">1.1.3.2.</span> <span class="nav-text">三副本对等部署形态</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RocketMQ-Slave-Acting-Master-Mode"><span class="nav-number">2.</span> <span class="nav-text">RocketMQ Slave Acting Master Mode</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#RocketMQ-DLedger-%E6%9E%B6%E6%9E%84"><span class="nav-number">2.0.0.1.</span> <span class="nav-text">RocketMQ DLedger 架构</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Slave-Master-%E4%BB%A3%E7%90%86%E5%9B%BE"><span class="nav-number">2.0.0.2.</span> <span class="nav-text">Slave Master 代理图</span></a></li></ol></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BD%BB%E9%87%8F%E7%BA%A7%E5%BF%83%E8%B7%B3%E5%92%8C%E8%8E%B7%E5%8F%96%E5%89%AF%E6%9C%AC%E7%BB%84%E4%BF%A1%E6%81%AF"><span class="nav-number">2.1.</span> <span class="nav-text">轻量级心跳和获取副本组信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%8C%E7%BA%A7%E6%B6%88%E6%81%AF%E9%80%83%E9%80%B8%EF%BC%88%E6%88%91%E5%8F%82%E4%B8%8E%E7%9A%84%E5%B0%B1%E6%98%AF%E4%BA%8B%E7%89%A9%E6%B6%88%E6%81%AF%E7%9A%84%E9%80%83%E9%80%B8%E6%9C%BA%E5%88%B6%EF%BC%89"><span class="nav-number">2.2.</span> <span class="nav-text">二级消息逃逸（我参与的就是事物消息的逃逸机制）</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E9%80%83%E9%80%B8"><span class="nav-number">2.2.0.1.</span> <span class="nav-text">本地逃逸</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E8%BF%9C%E7%A8%8B%E9%80%83%E9%80%B8"><span class="nav-number">2.2.0.2.</span> <span class="nav-text">远程逃逸</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E9%A2%84%E4%B8%8A%E7%BA%BF%E6%9C%BA%E5%88%B6"><span class="nav-number">2.2.0.3.</span> <span class="nav-text">预上线机制</span></a></li></ol></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
